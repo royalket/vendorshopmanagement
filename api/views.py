@@ -2,14 +2,17 @@ from django.urls import path
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status
-from shops.models import Shop
-from shops.serializers import NearbyShopSerializer
-from haversine import haversine
+from django.apps import apps
 
 class NearbyShopsAPIView(APIView):
     permission_classes = [permissions.AllowAny]
     
     def get(self, request):
+        # Import inside the method to avoid loading models at module level
+        from shops.models import Shop
+        from shops.serializers import NearbyShopSerializer
+        from haversine import haversine
+        
         # Get parameters from request
         try:
             latitude = float(request.query_params.get('latitude'))
@@ -48,6 +51,10 @@ class NearbyShopsAPIView(APIView):
         serializer = NearbyShopSerializer(nearby_shops, many=True)
         return Response(serializer.data)
 
-urlpatterns = [
-    path('', NearbyShopsAPIView.as_view(), name='nearby-shops'),
-]
+# Define URL patterns separately to avoid model imports at module level
+def get_urlpatterns():
+    return [
+        path('', NearbyShopsAPIView.as_view(), name='nearby-shops'),
+    ]
+
+urlpatterns = get_urlpatterns()

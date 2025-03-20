@@ -5,3 +5,4 @@ python-dotenv==1.0.0
 django-cors-headers==4.3.0
 haversine==2.8.0
 drf-yasg==1.21.7
+setuptools>=70.0.0
